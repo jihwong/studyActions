@@ -1,0 +1,5 @@
+deb http://192.168.1.154/ bionic main restricted universe multiverse
+deb http://192.168.1.154/ bionic-updates main restricted universe multiverse
+deb http://192.168.1.154/ bionic-backports main restricted universe multiverse
+deb http://192.168.1.154/ bionic-security main restricted universe multiverse
+deb [trusted=yes] http://192.168.1.125/ octa18 test
