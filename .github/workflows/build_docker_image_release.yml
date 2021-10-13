@@ -2,11 +2,18 @@
 name: build docker image release
 on:
   push:
-    branches: 
-    - main
+    tags:
+    - 'v*.*.*'
+#     branches: 
+#     - main
 jobs:
   build:
     runs-on: self-hosted
+    env:
+      DOCKER_API_VERSION: 1.38
+      DOCKER_HARBOR_REGISTRY: "octahub.8lab.cn:5000"
+      GO111MODULE: auto
+      
     steps:
     - uses: actions/checkout@v2
     
@@ -14,12 +21,27 @@ jobs:
       uses: actions/setup-go@v2
       with:
         go-version: 1.17
-        
-    - name: pwd
-      run: pwd
 
     - name: Build
-      run: go build -v ./...
+      run: go build -o docker/testAction -v ./...
 
-    - name: Test
-      run: go test -v ./...
+    - name: Docker Login
+      uses: docker/login-action@v1.10.0
+      with:
+        registry: ${{ env.DOCKER_HARBOR_REGISTRY }}
+        username: ${{ secrets.docker_harbor_name }}
+        password: ${{ secrets.docker_harbor_pwd }}
+        logout: true
+        
+    - name: Build the Docker Image
+      run: |
+        tag=${GITHUB_REF:10}
+        echo $GITHUB_REF
+        echo "Build Tag '$tag'"
+        cd docker
+        docker build -t ${{ env.DOCKER_HARBOR_REGISTRY }}/99/testAction:$tag  ./
+        regex='^v([0-9]+\.){0,2}(\*|[0-9]+)$'
+        if [[ $tag =~ $regex ]]; then
+          echo "Build Stable Version '$tag'"
+          docker tag ${{ env.DOCKER_HARBOR_REGISTRY }}/99/testAction:$tag ${{ env.DOCKER_HARBOR_REGISTRY }}/99/testAction:latest
+        fi
