@@ -39,9 +39,9 @@ jobs:
         echo $GITHUB_REF
         echo "Build Tag '$tag'"
         cd docker
-        docker build -t ${{ env.DOCKER_HARBOR_REGISTRY }}/99/testAction:$tag  ./
+        docker build -t ${{ env.DOCKER_HARBOR_REGISTRY }}/99/test_action:$tag  ./
         regex='^v([0-9]+\.){0,2}(\*|[0-9]+)$'
         if [[ $tag =~ $regex ]]; then
           echo "Build Stable Version '$tag'"
-          docker tag ${{ env.DOCKER_HARBOR_REGISTRY }}/99/testAction:$tag ${{ env.DOCKER_HARBOR_REGISTRY }}/99/testAction:latest
+          docker tag ${{ env.DOCKER_HARBOR_REGISTRY }}/99/test_action:$tag ${{ env.DOCKER_HARBOR_REGISTRY }}/99/test_action:latest
         fi
